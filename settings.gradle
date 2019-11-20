@@ -1,0 +1,6 @@
+rootProject.name = 'openId'
+include 'gateway'
+include 'session-server'
+include 'auth-server'
+include 'discovery'
+
