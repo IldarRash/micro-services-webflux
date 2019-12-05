@@ -1,6 +1,7 @@
-server:
-  port: 8888
-
 spring:
   application:
     name: auth
+  rsocket:
+    server:
+      port: 7000
+      transport: tcp
