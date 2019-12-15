@@ -9,3 +9,12 @@ eureka:
 spring:
   application:
     name: gateway
+  cloud:
+    gateway:
+      routes:
+        - id: auth_filter
+          uri: https://example.org
+          predicates:
+            - Path=/**
+          filters:
+            - Autherization
