@@ -48,6 +48,10 @@ subprojects {
         apply(plugin = "org.springframework.boot")
         apply(plugin = "io.spring.dependency-management")
 
+        repositories {
+            jcenter()
+        }
+
         dependencyManagement {
             imports {
                 mavenBom("org.springframework.cloud:spring-cloud-dependencies:Hoxton.RELEASE")
@@ -55,12 +59,31 @@ subprojects {
         }
 
         dependencies {
-            implementation(project(":commons"))
+            implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+            implementation("org.jetbrains.kotlin:kotlin-reflect")
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
             implementation("org.springframework.boot:spring-boot-starter-actuator")
             implementation("org.springframework.boot:spring-boot-starter-rsocket")
             implementation("org.projectlombok:lombok")
 
             annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+        }
+    } else {
+        apply(plugin = "kotlin")
+        repositories {
+            jcenter()
+        }
+
+        dependencies {
+            implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+            implementation("org.jetbrains.kotlin:kotlin-reflect")
+        }
+    }
+
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+            jvmTarget = "11"
         }
     }
 }
