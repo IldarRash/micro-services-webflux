@@ -24,15 +24,15 @@ public class AutherizationGatewayFilterFactory extends AbstractGatewayFilterFact
         return (exchange, chain) -> {
             log.info("Auth filter request");
             return authRequest(exchange).flatMap(authRequest -> {
-                        log.info("authorization redirect {}", authRequest.isAuth() ? "not required" : "required");
-                        return authRequest.isAuth() ? chain.filter(exchange) : redirectToAutPage(exchange);
+                        log.info("authorization redirect {}", authRequest.getAuth() ? "not required" : "required");
+                        return authRequest.getAuth() ? chain.filter(exchange) : redirectToAutPage(exchange);
                     }
             );
         };
     }
 
     private Mono<AuthRequest> authRequest(ServerWebExchange exchange) {
-        return authWebService.auth(exchange.getRequest().getQueryParams().get("user").get(0));
+        return authWebService.auth(exchange.getRequest().getQueryParams().toSingleValueMap().get("user"));
 
     }
 

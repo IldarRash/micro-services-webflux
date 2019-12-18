@@ -1,13 +1,13 @@
 package example.demo;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.autoconfigure.data.mongo.MongoReactiveDataAutoConfiguration
 import org.springframework.boot.runApplication
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient
 
 
 @EnableDiscoveryClient
-@SpringBootApplication
+@SpringBootApplication(exclude = [MongoReactiveDataAutoConfiguration::class])
 class AuthServer
 
 fun main(args: Array<String>) {

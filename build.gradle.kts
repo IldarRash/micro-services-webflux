@@ -66,6 +66,8 @@ subprojects {
             implementation("org.springframework.boot:spring-boot-starter-rsocket")
             implementation("org.projectlombok:lombok")
 
+            implementation("io.github.microutils:kotlin-logging:1.5.9")
+
             annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
         }
     } else {

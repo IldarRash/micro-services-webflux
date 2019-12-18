@@ -7,4 +7,4 @@ include( "some-service2")
 include( "commons")
 
 rootProject.name = "openId"
-
+include("config")
