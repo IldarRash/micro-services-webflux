@@ -2,20 +2,25 @@ package example.demo.controllers;
 
 import auth.dto.AuthRequest
 import auth.dto.AuthResponse
-import auth.dto.Request
+import example.demo.models.Session
+import example.demo.repositories.SessionRepo
 import mu.KotlinLogging
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.stereotype.Controller
-import java.sql.DriverManager.println
+import java.util.*
 
 @Controller
-class AuthController {
+class AuthController(val sessionRepo: SessionRepo) {
     private val logger = KotlinLogging.logger {}
 
     @MessageMapping("auth-handler")
     suspend fun auth(user: String): AuthRequest {
         logger.info { "User log with this userName ${user}"};
-        return if ("user" == user) AuthRequest(true) else AuthRequest(false)
+        if ("user" == user) {
+            val usrSession = sessionRepo.saveSession(Session(UUID.randomUUID(), user))
+            return AuthRequest(true, usrSession.id.toString())
+        }
+        return  AuthRequest(false, null)
     }
 
 

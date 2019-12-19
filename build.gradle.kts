@@ -64,7 +64,6 @@ subprojects {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
             implementation("org.springframework.boot:spring-boot-starter-actuator")
             implementation("org.springframework.boot:spring-boot-starter-rsocket")
-            implementation("org.projectlombok:lombok")
 
             implementation("io.github.microutils:kotlin-logging:1.5.9")
 
