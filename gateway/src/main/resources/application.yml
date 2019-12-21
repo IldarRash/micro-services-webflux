@@ -17,4 +17,4 @@ spring:
           predicates:
             - Path=/**
           filters:
-            - Autherization
+            - Authorization

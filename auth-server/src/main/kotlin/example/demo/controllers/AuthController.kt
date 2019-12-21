@@ -2,37 +2,25 @@ package example.demo.controllers;
 
 import auth.dto.AuthRequest
 import auth.dto.AuthResponse
-import example.demo.models.Session
-import example.demo.repositories.SessionRepo
+import auth.dto.CodeResponse
+import example.demo.services.AuthenticationService
 import mu.KotlinLogging
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.stereotype.Controller
-import java.util.*
 
 @Controller
-class AuthController(val sessionRepo: SessionRepo) {
+class AuthController(val authenticationService: AuthenticationService) {
     private val logger = KotlinLogging.logger {}
 
-    @MessageMapping("auth-handler")
-    suspend fun auth(user: String): AuthRequest {
-        logger.info { "User log with this userName ${user}"};
-        if ("user" == user) {
-            val usrSession = sessionRepo.saveSession(Session(UUID.randomUUID(), user))
-            return AuthRequest(true, usrSession.id.toString())
-        }
-        return  AuthRequest(false, null)
-    }
-
-
     @MessageMapping("get-auth-code")
-    suspend fun getAuthCode(request: AuthRequest) : AuthResponse {
+    suspend fun getAuthCode(request: AuthRequest) : CodeResponse {
         logger.info { "get auth code by request $request" }
-        return AuthResponse(true);
+        return authenticationService.creatSessionAndGetAuthCode(request);
     }
 
     @MessageMapping("get-tokens")
-    suspend fun getTokensByAuthCode(request: AuthRequest) : AuthResponse {
+    suspend fun getTokensByAuthCode(request: AuthRequest) {
         logger.info { "get token by auth code $request" }
-        return AuthResponse(true);
+        //return AuthResponse(true)
     }
 }

@@ -2,7 +2,7 @@ package auth.dto
 
 interface Request {}
 
-data class AuthRequest(val auth: Boolean, val token: String?) : Request
+data class AuthRequest(val token: String?) : Request
 
 class UserInfo(
 

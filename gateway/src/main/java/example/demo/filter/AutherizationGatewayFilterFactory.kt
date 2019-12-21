@@ -1,7 +1,9 @@
 package example.demo.filter
 
 import auth.dto.AuthRequest
-import example.demo.client.AuthWebService
+import auth.dto.AuthResponse
+import auth.dto.Response
+import example.demo.client.AuthorizationService
 import mu.KotlinLogging
 import org.springframework.cloud.gateway.filter.GatewayFilter
 import org.springframework.cloud.gateway.filter.GatewayFilterChain
@@ -12,21 +14,23 @@ import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
 
 @Component
-class AutherizationGatewayFilterFactory(val authWebService: AuthWebService) : AbstractGatewayFilterFactory<Any?>() {
+class AuthorizationGatewayFilterFactory(val authorizationService: AuthorizationService) : AbstractGatewayFilterFactory<Any?>() {
     private val logger = KotlinLogging.logger {}
 
     override fun apply(config: Any?): GatewayFilter {
         return GatewayFilter { exchange: ServerWebExchange, chain: GatewayFilterChain ->
             logger.info("Auth filter request")
-            authRequest(exchange).flatMap { authRequest: AuthRequest ->
-                logger.info("authorization redirect {}", if (authRequest.auth) "not required" else "required")
-                if (authRequest.auth) chain.filter(exchange) else redirectToAutPage(exchange)
+            authRequest(exchange).flatMap { authResponse : AuthResponse ->
+                logger.info("authorization redirect {}", if (authResponse.auth) "not required" else "required")
+                if (authResponse.auth) chain.filter(exchange) else redirectToAutPage(exchange)
             }
         }
     }
 
-    private fun authRequest(exchange: ServerWebExchange): Mono<AuthRequest> {
-        return authWebService.auth(exchange.request.queryParams.toSingleValueMap()["user"])
+    private fun authRequest(exchange: ServerWebExchange): Mono<AuthResponse> {
+        if (exchange.request.headers.containsKey("authorization"))
+            return authorizationService.getAuthCode(AuthRequest((exchange.request.headers["authorization"]?.get(0))));
+        return Mono.just(AuthResponse(false))
     }
 
     private fun redirectToAutPage(exchange: ServerWebExchange): Mono<Void> {
