@@ -15,3 +15,13 @@ services:
       - ./mongo-volume:/data/db
     ports:
      - '27017-27019:27017-27019'
+
+  redis:
+    image: redis
+    container_name: 'my-redis'
+    volumes:
+      - ../data/redis:/data
+    entrypoint: redis-server --appendonly yes
+    restart: always
+    ports:
+      - "6379:6379"

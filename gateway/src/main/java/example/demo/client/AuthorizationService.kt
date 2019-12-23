@@ -20,6 +20,7 @@ class AuthorizationService(val rSocketRequester: RSocketRequester) {
 
     fun getAuthCode(authRequest: AuthRequest): Mono<AuthResponse> {
         logger.info { "Get authCode $authRequest" }
+
         return rSocketRequester.route("get-auth-code")
                 .data(authRequest)
                 .retrieveMono(AuthResponse::class.java)

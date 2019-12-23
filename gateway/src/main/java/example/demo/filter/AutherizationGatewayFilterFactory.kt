@@ -4,6 +4,7 @@ import auth.dto.AuthRequest
 import auth.dto.AuthResponse
 import auth.dto.Response
 import example.demo.client.AuthorizationService
+import example.demo.model.AuthContext
 import mu.KotlinLogging
 import org.springframework.cloud.gateway.filter.GatewayFilter
 import org.springframework.cloud.gateway.filter.GatewayFilterChain
@@ -11,7 +12,9 @@ import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFac
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.server.ServerWebExchange
+import org.springframework.web.server.WebSession
 import reactor.core.publisher.Mono
+import java.util.*
 
 @Component
 class AuthorizationGatewayFilterFactory(val authorizationService: AuthorizationService) : AbstractGatewayFilterFactory<Any?>() {
@@ -28,9 +31,15 @@ class AuthorizationGatewayFilterFactory(val authorizationService: AuthorizationS
     }
 
     private fun authRequest(exchange: ServerWebExchange): Mono<AuthResponse> {
-        if (exchange.request.headers.containsKey("authorization"))
-            return authorizationService.getAuthCode(AuthRequest((exchange.request.headers["authorization"]?.get(0))));
-        return Mono.just(AuthResponse(false))
+        return exchange.session
+                .flatMap {
+                    val authContext = it.getAttribute<AuthContext>("auth")
+                    return@flatMap if (authContext == null)
+                        createInitRequest(it)
+                    else {
+                        authorizationService.getAuthCode(AuthRequest(authContext.userId));
+                    }
+                }
     }
 
     private fun redirectToAutPage(exchange: ServerWebExchange): Mono<Void> {
@@ -39,5 +48,11 @@ class AuthorizationGatewayFilterFactory(val authorizationService: AuthorizationS
             val response = exchange.response
             response.statusCode = HttpStatus.FOUND
         }
+    }
+
+    private fun createInitRequest(webSession: WebSession): Mono<AuthResponse> {
+        webSession.attributes["auth"] = AuthContext(UUID.randomUUID().toString())
+        return Mono.just(AuthResponse(false))
+
     }
 }
